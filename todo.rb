@@ -2,8 +2,8 @@ require "sinatra"
 require "sinatra/reloader"
 require "sinatra/content_for"
 require "tilt/erubi"
-
-require_relative 'session_persistence'
+require 'pry'
+require_relative 'database_persistence'
 
 configure do
   enable :sessions
@@ -70,7 +70,7 @@ end
 
 # Routes
 before do
-  @storage = SessionPersistence.new(session)
+  @storage = DatabasePersistence.new()
 end
 
 get "/" do
