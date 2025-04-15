@@ -66,7 +66,7 @@ class SessionPersistence
 
   def update_list_name(id, new_name)
     list = find_list(id)
-    list[:name] = list_name
+    list[:name] = new_name
   end
 
   def delete_list(id)
@@ -82,7 +82,7 @@ class SessionPersistence
 
   def find_todo(list_id, todo_id)
     list = find_list(list_id)
-    list[:todos].find { |todo| todo.id == todo_id }
+    list[:todos].find { |todo| todo[:id] == todo_id }
   end
 
   def delete_todo(list_id, todo_id)
@@ -260,9 +260,6 @@ post "/lists/:list_id/todos/:id" do
 
   @storage.update_todo_status(@list_id, todo_id, is_completed)
 
-  todo = @list[:todos].find { |todo| todo[:id] == todo_id }
-  todo[:completed] = is_completed
-
   session[:success] = "The todo has been updated."
   redirect "/lists/#{@list_id}"
 end
@@ -272,7 +269,7 @@ post "/lists/:id/complete_all" do
   @list_id = params[:id].to_i
   @list = load_list(@list_id)
 
-  @storage.complete_all_todos(list_id)
+  @storage.complete_all_todos(@list_id)
 
   session[:success] = "All todos have been completed."
   redirect "/lists/#{@list_id}"
