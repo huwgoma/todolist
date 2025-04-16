@@ -3,28 +3,55 @@ require 'pg'
 class DatabasePersistence
   attr_reader :db
   
-  def initialize()
+  def initialize(logger)
     @db = PG.connect(dbname: 'todos')
+    @logger = logger
+  end
+
+  def query(sql, *params)
+    @logger.info "#{sql}: #{params}"
+
+    db.exec_params(sql, params)
   end
 
   # Lists
   def lists
-    result = db.exec("SELECT * FROM lists;")
-    result.map { |row| row_to_hash(row) }
+    lists_sql = "SELECT * FROM lists"
+    lists_result = query(lists_sql)
+
+    lists_result.map do |list|
+      list_id = list['id']
+
+      todos_sql = "SELECT * FROM todos WHERE list_id = $1"
+      todos_result = query(todos_sql, list_id)
+      todos = todos_result.map { |todo_row| format_todo(todo_row) }
+
+      format_list(list, todos)
+    end
   end
+
+  def format_list(list_row, todos)
+    { id: list_row['id'].to_i, name: list_row['name'],
+      todos: todos
+    }
+  end
+
+  def format_todo(todo_row)
+    { id: todo_row['id'].to_i, name: todo_row['name'], completed: todo_row['completed'] }
+  end
+
+
 
   def find_list(id)
     sql = "SELECT * FROM lists WHERE id = $1"
-    result = db.exec_params(sql, [id])
+    result = query(sql, id)
+    binding.pry
     row_to_hash(result.first)
   end
 
-  private 
+  private
 
-  # Convert PG::Result rows to application-friendly Hash rows
-  def row_to_hash(row)
-    { id: row['id'].to_i, name: row['name'], todos: [] }  
-  end
+
   # def find_list(id)
   #   session[:lists].find { |list| list[:id] == id }  
   # end
