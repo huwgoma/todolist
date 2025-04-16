@@ -44,11 +44,17 @@ class DatabasePersistence
   end
   
   def format_list(list_row, todos)
-    { id: list_row['id'].to_i, name: list_row['name'], todos: todos }
+    { id: list_row['id'].to_i, 
+      name: list_row['name'], 
+      todos: todos 
+    }
   end
 
   def format_todo(todo_row)
-    { id: todo_row['id'].to_i, name: todo_row['name'], completed: todo_row['completed'] }
+    { id: todo_row['id'].to_i, 
+      name: todo_row['name'], 
+      completed: todo_row['completed'] == 't'
+    }
   end
 
   # def find_list(id)
