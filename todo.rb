@@ -158,14 +158,14 @@ end
 post "/lists/:list_id/todos" do
   @list_id = params[:list_id].to_i
   @list = load_list(@list_id)
-  text = params[:todo].strip
+  name = params[:todo].strip
 
-  error = error_for_todo(text)
+  error = error_for_todo(name)
   if error
     session[:error] = error
     erb :list, layout: :layout
   else
-    @storage.create_todo(@list_id, text)
+    @storage.create_todo(@list_id, name)
 
     session[:success] = "The todo was added."
     redirect "/lists/#{@list_id}"
