@@ -103,7 +103,6 @@ post "/lists" do
   else
     @storage.create_list(list_name)
 
-    
     session[:success] = "The list has been created."
     redirect "/lists"
   end

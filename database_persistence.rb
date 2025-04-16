@@ -34,6 +34,16 @@ class DatabasePersistence
     format_list(result.first, load_todos(id))
   end
 
+  def create_list(name)
+    sql = "INSERT INTO lists(name) VALUES($1);"
+    query(sql, name)
+  end
+
+  def delete_list(id)
+    sql = "DELETE FROM lists WHERE id = $1"
+    query(sql, id)
+  end
+
   private
 
   def load_todos(list_id)
@@ -76,34 +86,31 @@ class DatabasePersistence
   #   list[:name] = new_name
   # end
 
-  def delete_list(id)
-  #   session[:lists].reject! { |list| list[:id] == id }
-  end
 
   # # Todos
-  def create_todo(list_id, todo_name)
-  #   list = find_list(list_id)
-  #   id = next_element_id(list[:todos])
-  #   list[:todos] << { id: id, name: todo_name, completed: false }
-  end
+  # def create_todo(list_id, todo_name)
+  # #   list = find_list(list_id)
+  # #   id = next_element_id(list[:todos])
+  # #   list[:todos] << { id: id, name: todo_name, completed: false }
+  # end
 
-  def find_todo(list_id, todo_id)
-  #   list = find_list(list_id)
-  #   list[:todos].find { |todo| todo[:id] == todo_id }
-  end
+  # def find_todo(list_id, todo_id)
+  # #   list = find_list(list_id)
+  # #   list[:todos].find { |todo| todo[:id] == todo_id }
+  # end
 
-  def delete_todo(list_id, todo_id)
-  #   list = find_list(list_id)
-  #   list[:todos].reject! { |todo| todo[:id] == todo_id }
-  end
+  # def delete_todo(list_id, todo_id)
+  # #   list = find_list(list_id)
+  # #   list[:todos].reject! { |todo| todo[:id] == todo_id }
+  # end
 
-  def update_todo_status(list_id, todo_id, completion_status)
-  #   todo = find_todo(list_id, todo_id)
-  #   todo[:completed] = completion_status
-  end
+  # def update_todo_status(list_id, todo_id, completion_status)
+  # #   todo = find_todo(list_id, todo_id)
+  # #   todo[:completed] = completion_status
+  # end
 
-  def complete_all_todos(list_id)
-  #   list = find_list(list_id)
-  #   list[:todos].each { |todo| todo[:completed] = true }
-  end
+  # def complete_all_todos(list_id)
+  # #   list = find_list(list_id)
+  # #   list[:todos].each { |todo| todo[:completed] = true }
+  # end
 end
