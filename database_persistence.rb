@@ -44,6 +44,11 @@ class DatabasePersistence
     query(sql, id)
   end
 
+  def update_list_name(id, new_name)
+    sql = "UPDATE lists SET name = $1 WHERE id = $2"
+    query(sql, new_name, id)
+  end
+
   private
 
   def load_todos(list_id)
