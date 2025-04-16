@@ -22,35 +22,34 @@ class DatabasePersistence
     lists_result.map do |list|
       list_id = list['id']
 
-      todos_sql = "SELECT * FROM todos WHERE list_id = $1"
-      todos_result = query(todos_sql, list_id)
-      todos = todos_result.map { |todo_row| format_todo(todo_row) }
-
+      todos = load_todos(list_id)
       format_list(list, todos)
     end
   end
 
+  def find_list(id)
+    sql = "SELECT * FROM lists WHERE id = $1"
+    result = query(sql, id)
+
+    format_list(result.first, load_todos(id))
+  end
+
+  private
+
+  def load_todos(list_id)
+    sql = "SELECT * FROM todos WHERE list_id = $1"
+    result = query(sql, list_id)
+
+    result.map { |row| format_todo(row) }
+  end
+  
   def format_list(list_row, todos)
-    { id: list_row['id'].to_i, name: list_row['name'],
-      todos: todos
-    }
+    { id: list_row['id'].to_i, name: list_row['name'], todos: todos }
   end
 
   def format_todo(todo_row)
     { id: todo_row['id'].to_i, name: todo_row['name'], completed: todo_row['completed'] }
   end
-
-
-
-  def find_list(id)
-    sql = "SELECT * FROM lists WHERE id = $1"
-    result = query(sql, id)
-    binding.pry
-    row_to_hash(result.first)
-  end
-
-  private
-
 
   # def find_list(id)
   #   session[:lists].find { |list| list[:id] == id }  
