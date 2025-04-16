@@ -2,7 +2,6 @@
 DROP TABLE IF EXISTS todos;
 DROP TABLE IF EXISTS lists;
 
-
 CREATE TABLE lists (
   id serial PRIMARY KEY,
   name text UNIQUE NOT NULL

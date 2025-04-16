@@ -5,6 +5,7 @@ gem "sinatra-contrib"
 gem "erubi"
 gem "webrick"
 gem "pg"
+gem "puma"
 
 gem 'pry'
 
