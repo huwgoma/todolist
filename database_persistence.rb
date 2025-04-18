@@ -21,14 +21,23 @@ class DatabasePersistence
 
   # Lists
   def lists
-    lists_sql = "SELECT * FROM lists"
+    lists_sql = <<~SQL
+      SELECT lists.*, COUNT(todos.id) AS todos_count, COUNT(NULLIF(todos.completed, true)) AS todos_remaining_count
+      FROM lists LEFT JOIN todos ON lists.id = todos.list_id
+      GROUP BY lists.id
+      ORDER BY lists.name;
+    SQL
+
     lists_result = query(lists_sql)
 
     lists_result.map do |list|
       list_id = list['id']
 
-      todos = load_todos(list_id)
-      format_list(list, todos)
+      { id: list_id, name: list['name'],
+        todos_count: list['todos_count'].to_i, todos_remaining_count: list['todos_remaining_count'].to_i 
+      }
+
+      #format_list(list, todos)
     end
   end
 
