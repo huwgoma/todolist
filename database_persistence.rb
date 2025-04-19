@@ -34,18 +34,40 @@ class DatabasePersistence
       list_id = list['id']
 
       { id: list_id, name: list['name'],
-        todos_count: list['todos_count'].to_i, todos_remaining_count: list['todos_remaining_count'].to_i 
+        todos_count: list['todos_count'].to_i, 
+        todos_remaining_count: list['todos_remaining_count'].to_i 
       }
-
-      #format_list(list, todos)
     end
   end
 
-  def find_list(id)
-    sql = "SELECT * FROM lists WHERE id = $1"
-    result = query(sql, id)
+  # def format_list(list_row, todos)
+  #   { id: list_row['id'].to_i, name: list_row['name'],
+      
+  #   }
+    
+  #   { id: list_row['id'].to_i, 
+  #     name: list_row['name'], 
+  #     todos: todos 
+  #   }
+  # end
 
-    format_list(result.first, load_todos(id))
+  def find_list(id)
+    sql = <<~SQL
+      SELECT lists.*, COUNT(todos.id) AS todos_count, COUNT(NULLIF(todos.completed, true)) AS todos_remaining_count
+      FROM lists LEFT JOIN todos ON lists.id = todos.list_id
+      WHERE lists.id = $1
+      GROUP BY lists.id
+      ORDER BY lists.name;
+    SQL
+
+    list = query(sql, id).first
+    todos = load_todos(id)
+
+    { id: list['id'].to_i, name: list['name'], todos: todos, 
+      todos_count: list['todos_count'].to_i, todos_remaining_count: list['todos_remaining_count'].to_i
+    }
+    
+    #format_list(result.first, load_todos(id))
   end
 
   def create_list(name)
@@ -100,12 +122,7 @@ class DatabasePersistence
     result.map { |row| format_todo(row) }
   end
   
-  def format_list(list_row, todos)
-    { id: list_row['id'].to_i, 
-      name: list_row['name'], 
-      todos: todos 
-    }
-  end
+  
 
   def format_todo(todo_row)
     { id: todo_row['id'].to_i, 
