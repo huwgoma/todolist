@@ -61,10 +61,10 @@ class DatabasePersistence
     SQL
 
     list = query(sql, id).first
-    todos = load_todos(id)
 
-    { id: list['id'].to_i, name: list['name'], todos: todos, 
-      todos_count: list['todos_count'].to_i, todos_remaining_count: list['todos_remaining_count'].to_i
+    { id: list['id'].to_i, name: list['name'],
+      todos_count: list['todos_count'].to_i, 
+      todos_remaining_count: list['todos_remaining_count'].to_i
     }
     
     #format_list(result.first, load_todos(id))
@@ -86,6 +86,13 @@ class DatabasePersistence
   end
 
   # To-Dos
+  def load_todos(list_id)
+    sql = "SELECT * FROM todos WHERE list_id = $1"
+    result = query(sql, list_id)
+
+    result.map { |row| format_todo(row) }
+  end
+  
   def create_todo(list_id, name)
     sql = "INSERT INTO todos (name, list_id)
            VALUES ($1, $2)"
@@ -115,12 +122,7 @@ class DatabasePersistence
 
   private
 
-  def load_todos(list_id)
-    sql = "SELECT * FROM todos WHERE list_id = $1"
-    result = query(sql, list_id)
-
-    result.map { |row| format_todo(row) }
-  end
+ 
   
   
 
