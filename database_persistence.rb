@@ -31,25 +31,9 @@ class DatabasePersistence
     lists_result = query(lists_sql)
 
     lists_result.map do |list|
-      list_id = list['id']
-
-      { id: list_id, name: list['name'],
-        todos_count: list['todos_count'].to_i, 
-        todos_remaining_count: list['todos_remaining_count'].to_i 
-      }
+      format_list(list)
     end
   end
-
-  # def format_list(list_row, todos)
-  #   { id: list_row['id'].to_i, name: list_row['name'],
-      
-  #   }
-    
-  #   { id: list_row['id'].to_i, 
-  #     name: list_row['name'], 
-  #     todos: todos 
-  #   }
-  # end
 
   def find_list(id)
     sql = <<~SQL
@@ -60,14 +44,9 @@ class DatabasePersistence
       ORDER BY lists.name;
     SQL
 
-    list = query(sql, id).first
+    result = query(sql, id)
 
-    { id: list['id'].to_i, name: list['name'],
-      todos_count: list['todos_count'].to_i, 
-      todos_remaining_count: list['todos_remaining_count'].to_i
-    }
-    
-    #format_list(result.first, load_todos(id))
+    format_list(result.first)
   end
 
   def create_list(name)
@@ -92,7 +71,7 @@ class DatabasePersistence
 
     result.map { |row| format_todo(row) }
   end
-  
+
   def create_todo(list_id, name)
     sql = "INSERT INTO todos (name, list_id)
            VALUES ($1, $2)"
@@ -122,9 +101,12 @@ class DatabasePersistence
 
   private
 
- 
-  
-  
+  def format_list(list)
+    { id: list['id'].to_i, name: list['name'],
+      todos_count: list['todos_count'].to_i, 
+      todos_remaining_count: list['todos_remaining_count'].to_i
+    }
+  end
 
   def format_todo(todo_row)
     { id: todo_row['id'].to_i, 
